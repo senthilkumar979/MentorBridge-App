@@ -1,0 +1,32 @@
+{
+  "cli": {
+    "version": ">= 21.0.2",
+    "appVersionSource": "remote"
+  },
+  "build": {
+    "development": {
+      "developmentClient": true,
+      "distribution": "internal"
+    },
+    "preview": {
+      "distribution": "internal",
+      "android": { "buildType": "apk" },
+      "env": {
+        "SENTRY_DISABLE_AUTO_UPLOAD": "true",
+        "EXPO_PUBLIC_API_URL": "https://api.mentorbridge.com",
+        "EXPO_PUBLIC_API_BASE_URL": "https://www.mentorbridge.in",
+        "EXPO_PUBLIC_CLERK_PUBLISHABLE_KEY": "pk_test_YWR2YW5jZWQtZ3JvdXBlci0zMC5jbGVyay5hY2NvdW50cy5kZXYk",
+        "EXPO_PUBLIC_POSTHOG_KEY": "phc_CRAenDsjHPRxJX2Lq5QOhAKei7g2gEkd6OoZqtC6lic",
+        "EXPO_PUBLIC_POSTHOG_HOST": "https://eu.posthog.com",
+        "EXPO_PUBLIC_SENTRY_DSN": "https://a7a6bcc21edff8c4dbd1d2cab45f6489@o4508450113716225.ingest.de.sentry.io/4508450116141136",
+        "EXPO_PUBLIC_LONG_LOGO_URL": "https://91qunajyvl11yxyb.public.blob.vercel-storage.com/long-logo"
+      }
+    },
+    "production": {
+      "autoIncrement": true
+    }
+  },
+  "submit": {
+    "production": {}
+  }
+}

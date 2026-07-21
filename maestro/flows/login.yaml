@@ -1,0 +1,11 @@
+appId: in.mentorbridge.admin
+---
+- launchApp
+- assertVisible: "Sign In"
+- tapOn: "Email"
+- inputText: "admin@test.mentorbridge.in"
+- tapOn:
+    id: "Password"
+- inputText: "${ADMIN_PASSWORD}"
+- tapOn: "Sign In"
+- assertVisible: "Dashboard"
