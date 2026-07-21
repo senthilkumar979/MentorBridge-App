@@ -1,20 +1,26 @@
-import { Link } from 'expo-router'
+import { Link } from "expo-router";
 import {
   KeyboardAvoidingView,
   Platform,
   ScrollView,
   Text,
   View,
-} from 'react-native'
-import { SafeAreaView } from 'react-native-safe-area-context'
+} from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 
-import { BrandLogo } from '@/components/ui/BrandLogo'
-import { Button } from '@/components/ui/Button'
-import { Input } from '@/components/ui/Input'
-import { LoginVerificationStep } from '@/features/auth/LoginVerificationStep'
-import { useLoginFlow } from '@/features/auth/useLoginFlow'
+import { BrandLogo } from "@/components/ui/BrandLogo";
+import { Button } from "@/components/ui/Button";
+import { Input } from "@/components/ui/Input";
+import { LoginVerificationStep } from "@/features/auth/LoginVerificationStep";
+import {
+  useGoogleSignIn,
+  useWarmUpBrowser,
+} from "@/features/auth/useGoogleSignIn";
+import { useLoginFlow } from "@/features/auth/useLoginFlow";
 
 export default function LoginScreen() {
+  useWarmUpBrowser();
+
   const {
     email,
     setEmail,
@@ -30,12 +36,15 @@ export default function LoginScreen() {
     onVerifyCode,
     onResendCode,
     onBackToCredentials,
-  } = useLoginFlow()
+  } = useLoginFlow();
+
+  const google = useGoogleSignIn();
+  const formError = error || google.error;
 
   return (
     <SafeAreaView className="flex-1 bg-background">
       <KeyboardAvoidingView
-        behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+        behavior={Platform.OS === "ios" ? "padding" : undefined}
         className="flex-1"
       >
         <ScrollView
@@ -43,19 +52,38 @@ export default function LoginScreen() {
           keyboardShouldPersistTaps="handled"
         >
           <View className="mb-10 items-center">
-            <BrandLogo height={48} showSubtitle />
+            <BrandLogo height={72} showSubtitle />
           </View>
 
           <Text className="mb-6 text-center text-base text-muted-foreground">
             {needsCode
-              ? codeStrategy === 'totp'
-                ? 'Enter the code from your authenticator app'
-                : 'Enter the verification code sent to your email'
-              : 'Sign in with your MentorBridge account'}
+              ? codeStrategy === "totp"
+                ? "Enter the code from your authenticator app"
+                : "Enter the verification code sent to your email"
+              : ""}
           </Text>
 
           {!needsCode ? (
             <View className="gap-4">
+              <Button
+                title="Continue with Google"
+                variant="outline"
+                loading={google.loading}
+                disabled={loading}
+                onPress={() => {
+                  google.setError(null);
+                  void google.onGoogleSignIn();
+                }}
+              />
+
+              <View className="flex-row items-center gap-3 py-1">
+                <View className="h-px flex-1 bg-border" />
+                <Text className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
+                  or email
+                </Text>
+                <View className="h-px flex-1 bg-border" />
+              </View>
+
               <Input
                 label="Email"
                 autoCapitalize="none"
@@ -73,12 +101,20 @@ export default function LoginScreen() {
                 onChangeText={setPassword}
                 placeholder="••••••••"
               />
-              {error ? (
-                <Text className="text-sm text-error" accessibilityLiveRegion="polite">
-                  {error}
+              {formError ? (
+                <Text
+                  className="text-sm text-error"
+                  accessibilityLiveRegion="polite"
+                >
+                  {formError}
                 </Text>
               ) : null}
-              <Button title="Sign In" onPress={onSignIn} loading={loading} />
+              <Button
+                title="Sign In"
+                onPress={onSignIn}
+                loading={loading}
+                disabled={google.loading}
+              />
             </View>
           ) : (
             <LoginVerificationStep
@@ -92,15 +128,8 @@ export default function LoginScreen() {
               onBack={onBackToCredentials}
             />
           )}
-
-          <Text className="mt-8 text-center text-xs text-muted-foreground">
-            Admins and students with a linked MentorBridge profile can sign in.
-          </Text>
-          <Link href="/" className="mt-2 text-center text-sm text-primary">
-            Refresh session
-          </Link>
         </ScrollView>
       </KeyboardAvoidingView>
     </SafeAreaView>
-  )
+  );
 }
